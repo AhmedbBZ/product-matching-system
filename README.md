@@ -1,13 +1,22 @@
-# Product Matching System
+To integrate your new `app.py`, `Dockerfile`, and testing suite into the project documentation, I have updated the `README.md` to reflect the new structure, the automated web interface, and the CI/CD pipeline.
 
-A semantic search system that matches product queries against a shop catalogue using AI embeddings and keyword search.
+Replace your current **README.md** with this version:
+
+---
+
+# Product Matching System (MLOPS Project)
+
+A semantic search system that matches product queries against a shop catalogue using AI embeddings and keyword search. This project includes a FastAPI backend, a web interface, and a full CI/CD testing pipeline.
 
 ## 📁 Project Structure
 
-```
+```text
 product-matcher/
+├── .github/workflows/
+│   └── tests.yml                  # CI/CD GitHub Actions
 ├── data/
-│   └── product_catalogue.csv       # Your product data
+│   ├── product_catalogue.csv       # Raw data
+│   └── product_catalogue_processed.csv # Generated after cleaning
 ├── models/                         # Auto-generated
 │   ├── faiss.index
 │   └── metadata.pkl
@@ -15,80 +24,85 @@ product-matcher/
 │   ├── data_processing.py         # Data cleaning
 │   ├── embedding_engine.py        # Embeddings + FAISS
 │   ├── retrieval.py               # Hybrid search
-│   └── app.py                     # REST API
-├── evaluation.ipynb               # Metrics & evaluation
-├── requirements.txt               # Dependencies
+│   └── app.py                     # FastAPI REST API & UI Router
+├── tests/                          # Automated Testing
+│   ├── conftest.py                # Pytest configuration/mocks
+│   └── test_app.py                # API unit tests
+├── index.html                      # Web Interface (Frontend)
+├── requirements.txt               # Main dependencies
+├── requirements-test.txt          # Testing dependencies
+├── Dockerfile                     # Containerization setup
 ├── README.md                      # This file
-├── REPORT.md                      # Technical report
-└── Dockerfile                     # Docker setup
+└── REPORT.md                      # Technical report
 ```
 
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
-
 ```bash
 pip install -r requirements.txt
+# For development/testing:
+pip install -r requirements-test.txt
 ```
 
-### 2. Prepare Data
-
-Place your CSV file at `data/product_catalogue.csv` with columns:
-- `product_id`, `title`, `vendor`, `tags`, `category`
-
-### 3. Process Data & Build Index
-
+### 2. Prepare & Index Data
+You must process the data and build the FAISS index before running the API.
 ```bash
-# Clean the data
+# 1. Clean the raw CSV
 python src/data_processing.py
 
-# Build embeddings
+# 2. Generate embeddings (requires models/ folder)
 python src/embedding_engine.py
 ```
 
-### 4. Start API
-
+### 3. Start the System
 ```bash
 python src/app.py
 ```
+*   **API:** http://localhost:8000/api/status
+*   **Web UI:** The system will automatically open your browser to http://localhost:8000
 
-API runs at http://localhost:8000
+---
 
-### 5. Test It
+## 🧪 Testing & CI/CD
 
+### Local Testing
+We use `pytest` with mocks for heavy dependencies (like Torch and FAISS) to ensure fast testing.
 ```bash
-curl "http://localhost:8000/search?q=dog%20food&top_k=5"
+pytest tests/ -v
 ```
 
-## 📊 Evaluation
+### GitHub Actions
+The project includes a `.github/workflows/tests.yml` file. On every **push** or **pull request** to `main` or `develop`, the system:
+1. Sets up Python 3.12.
+2. Installs testing dependencies.
+3. Runs the full test suite to ensure API stability.
 
-Run the Jupyter notebook:
+---
 
-```bash
-jupyter notebook evaluation.ipynb
-```
+## 🐳 Docker Deployment
 
-This generates:
-- Recall@1, Recall@5, MRR metrics
-- Confidence calibration analysis
-- Performance visualizations
+The system is containerized for easy deployment. It includes a health check and runs as a non-root user for security.
 
-## 🐳 Docker
-
+**Build for your current architecture:**
 ```bash
 docker build -t product-matcher .
+```
+
+**Run the container:**
+```bash
 docker run -p 8000:8000 product-matcher
 ```
 
-## 📖 API Endpoints
+---
 
-### Search Products
-```bash
-GET /search?q=YOUR_QUERY&top_k=2
-POST /search
-```
+## 📖 API Documentation
 
-**Response:**
+### Search (Hybrid)
+**Endpoint:** `GET /search?q=query&top_k=5`  
+**Endpoint:** `POST /search` (JSON Body: `{"query": "...", "top_k": 5}`)
+
+**Response Example:**
 ```json
 {
   "query": "dog food",
@@ -96,55 +110,34 @@ POST /search
     {
       "product_id": 4428755271778,
       "title": "Rottewiler Puppy Dog Food",
-      "vendor": "royal canine",
-      "category": "Animals & Pet Supplies",
-      "searchable_text": "Rottewiler Puppy Dog Food royal canine Animals & Pet Supplies dog food dry dog food",
       "semantic_score": 70.63,
       "lexical_score": 59.96,
-      "final_score": 67.43,
       "confidence": 67.43,
-      "match_quality": "MEDIUM",
-      "explanation": "Strong semantic similarity + Partial keyword match"
-    },
-    {
-      "product_id": 4373493645410,
-      "title": "Vet Life Growth Canine Formula Dog Food",
-      "vendor": "Farmina",
-      "category": "Animals & Pet Supplies",
-      "searchable_text": "Vet Life Growth Canine Formula Dog Food Farmina Animals & Pet Supplies 12 kg 2 kg dog food dog pregnancy care dog sexual care",
-      "semantic_score": 64.19,
-      "lexical_score": 54.55,
-      "final_score": 61.3,
-      "confidence": 61.3,
-      "match_quality": "MEDIUM",
-      "explanation": "Moderate semantic similarity + Partial keyword match"
+      "match_quality": "MEDIUM"
     }
   ]
 }
 ```
 
-## 🔧 Configuration
+### Health Check
+**Endpoint:** `GET /api/status`  
+Returns the total number of products loaded in memory and system status.
 
-Edit `src/retrieval.py` to adjust:
-- `semantic_weight` (default: 0.7)
-- `lexical_weight` (default: 0.3)
-- `threshold_high` (default: 85)
-
-## 📈 Performance
-
-- **Recall@1**: 96.6%
-- **Recall@5**: 94.8%
-- **MMR**: 95.7%
-- **Dataset**: 5,270 products
+---
 
 ## 🛠️ Tech Stack
+- **Backend:** Python 3.12, FastAPI, Uvicorn
+- **AI/Search:** Sentence-Transformers (All-MiniLM-L6-v2), FAISS, BM25
+- **Frontend:** HTML5/JavaScript (Tailwind/Fetch API)
+- **DevOps:** Docker, GitHub Actions, Pytest
 
-- Python 3.12
-- FastAPI
-- sentence-transformers
-- FAISS
-- BM25
+## 📝 Authors
+**Oussama Mrabtini / Mouhamed Ghassan Ayyari / Ahmed Bouzid**  
+*FSB MLOPS-Project 2026*
 
-## 📝 Author
+---
 
-[Oussama Mrabtini/Mouhamed Ghassan Ayyari/Ahmed Bouzid] FSB MLOPS-Project 2026
+### 💡 Implementation Notes for the Team:
+1.  **Frontend:** The `app.py` is configured to serve `index.html` from the root directory via `FileResponse`.
+2.  **Mocks:** In `conftest.py`, we mock `torch` and `sentence_transformers`. This allows us to run tests in environments without a GPU or high RAM (like GitHub Actions).
+3.  **Docker Platform:** If deploying to a server (AMD64) from a Mac (ARM64), remember to use `docker build --platform linux/amd64 -t product-matcher .`.
