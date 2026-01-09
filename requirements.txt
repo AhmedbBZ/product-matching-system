@@ -16,6 +16,11 @@ rank-bm25
 fastapi
 uvicorn
 
+# Testing
+pytest>=7.0
+pytest-asyncio>=0.21.0
+httpx>=0.24.0
+
 # Evaluation
 scikit-learn
 jupyter
