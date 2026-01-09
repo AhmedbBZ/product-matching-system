@@ -10,6 +10,16 @@ import os
 # Add src directory to path so imports work
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+# Provide lightweight stubs for heavy native modules that may not be
+# available in the CI/test environment (e.g. faiss). This lets the test
+# runner import application modules without installing large ML packages.
+try:
+    import types
+    if 'faiss' not in sys.modules:
+        sys.modules['faiss'] = types.ModuleType('faiss')
+except Exception:
+    pass
+
 
 @pytest.fixture
 def mock_retriever():
