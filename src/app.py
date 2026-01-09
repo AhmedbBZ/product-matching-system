@@ -1,4 +1,8 @@
+import sys
+from pathlib import Path
 
+# Add project root to path so imports work from anywhere
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,8 +11,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List
 import pandas as pd
-from .embedding_engine import EmbeddingEngine
-from .retrieval import HybridRetriever
+from src.embedding_engine import EmbeddingEngine
+from src.retrieval import HybridRetriever
 import uvicorn
 import webbrowser
 import os

@@ -14,6 +14,7 @@ product-matcher/
 │   ├── faiss.index
 │   └── metadata.pkl
 ├── src/
+|   ├── _init_.py                  # Make src a package   
 │   ├── data_processing.py         # Data cleaning
 │   ├── embedding_engine.py        # Embeddings + FAISS
 │   ├── retrieval.py               # Hybrid search
