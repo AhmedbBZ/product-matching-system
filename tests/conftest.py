@@ -14,6 +14,10 @@ sys.modules['torch'] = MagicMock()
 sys.modules['sentence_transformers'] = MagicMock()
 sys.modules['faiss'] = MagicMock()
 sys.modules['rank_bm25'] = MagicMock()
+# Mock tqdm to avoid needing the package in CI
+sys.modules['tqdm'] = MagicMock()
+sys.modules['tqdm.auto'] = MagicMock()
+sys.modules['tqdm.notebook'] = MagicMock()
 
 
 @pytest.fixture
