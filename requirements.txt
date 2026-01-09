@@ -1,0 +1,24 @@
+# Core dependencies
+pandas
+numpy
+
+# NLP and embeddings
+sentence-transformers
+torch
+
+# Vector search
+faiss-cpu
+
+# Lexical search
+rank-bm25
+
+# API
+fastapi
+uvicorn
+
+# Evaluation
+scikit-learn
+jupyter
+matplotlib
+seaborn
+tf-keras
