@@ -10,7 +10,6 @@ product-matcher/
 │   └── tests.yml                  # CI/CD GitHub Actions
 ├── data/
 │   ├── product_catalogue.csv       # Raw data
-│   └── product_catalogue_processed.csv # Generated after cleaning
 ├── models/                         # Auto-generated
 │   ├── faiss.index
 │   └── metadata.pkl
@@ -58,7 +57,7 @@ python src/embedding_engine.py
 python src/app.py
 ```
 
-The system now automatically opens your browser at http://localhost:8000. It serves a web interface via `index.html`.
+The system automatically opens your browser at http://localhost:8000. It serves a web interface via `index.html`.
 
 ## 5. Testing & CI/CD
 
@@ -68,9 +67,9 @@ The system now automatically opens your browser at http://localhost:8000. It ser
 curl "http://localhost:8000/search?q=dog%20food&top_k=5"
 ```
 
-## 🧪 Automated Testing (New)
+## 🧪 Automated Testing
 
-The project now includes a suite of unit tests with automated CI/CD via GitHub Actions.
+The project includes a suite of unit tests with automated CI/CD via GitHub Actions.
 
 **Run tests locally:**
 ```bash
@@ -170,7 +169,6 @@ FSB MLOPS-Project 2026
 
 ---
 
-### 💡 Implementation Notes for the Team:
+### 💡 Implementation Notes:
 1.  **Frontend:** The `app.py` is configured to serve `index.html` from the root directory via `FileResponse`.
 2.  **Mocks:** In `conftest.py`, we mock `torch` and `sentence_transformers`. This allows us to run tests in environments without a GPU or high RAM (like GitHub Actions).
-3.  **Docker Platform:** If deploying to a server (AMD64) from a Mac (ARM64), remember to use `docker build --platform linux/amd64 -t product-matcher .`.
