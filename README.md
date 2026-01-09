@@ -1,9 +1,3 @@
-To integrate your new `app.py`, `Dockerfile`, and testing suite into the project documentation, I have updated the `README.md` to reflect the new structure, the automated web interface, and the CI/CD pipeline.
-
-Replace your current **README.md** with this version:
-
----
-
 # Product Matching System (MLOPS Project)
 
 A semantic search system that matches product queries against a shop catalogue using AI embeddings and keyword search. This project includes a FastAPI backend, a web interface, and a full CI/CD testing pipeline.
@@ -46,7 +40,10 @@ pip install -r requirements-test.txt
 ```
 
 ### 2. Prepare & Index Data
-You must process the data and build the FAISS index before running the API.
+
+Place your CSV file at `data/product_catalogue.csv` with columns:
+- `product_id`, `title`, `vendor`, `tags`, `category`
+
 ```bash
 # 1. Clean the raw CSV
 python src/data_processing.py
@@ -56,23 +53,31 @@ python src/embedding_engine.py
 ```
 
 ### 3. Start the System
+
 ```bash
 python src/app.py
 ```
-*   **API:** http://localhost:8000/api/status
-*   **Web UI:** The system will automatically open your browser to http://localhost:8000
 
----
+The system now automatically opens your browser at http://localhost:8000. It serves a web interface via `index.html`.
 
-## 🧪 Testing & CI/CD
+## 5. Testing & CI/CD
 
 ### Local Testing
-We use `pytest` with mocks for heavy dependencies (like Torch and FAISS) to ensure fast testing.
+
+```bash
+curl "http://localhost:8000/search?q=dog%20food&top_k=5"
+```
+
+## 🧪 Automated Testing (New)
+
+The project now includes a suite of unit tests with automated CI/CD via GitHub Actions.
+
+**Run tests locally:**
 ```bash
 pytest tests/ -v
 ```
+*Note: Tests use mocks for heavy libraries (FAISS/Torch), so they run instantly without a GPU.*
 
-### GitHub Actions
 The project includes a `.github/workflows/tests.yml` file. On every **push** or **pull request** to `main` or `develop`, the system:
 1. Sets up Python 3.12.
 2. Installs testing dependencies.
@@ -80,18 +85,31 @@ The project includes a `.github/workflows/tests.yml` file. On every **push** or 
 
 ---
 
+## 📊 Evaluation
+
+Run the Jupyter notebook:
+
+```bash
+jupyter notebook evaluation.ipynb
+```
+
+This generates:
+- Recall@1, Recall@5, MRR metrics
+- Confidence calibration analysis
+- Performance visualizations
+
 ## 🐳 Docker Deployment
 
 The system is containerized for easy deployment. It includes a health check and runs as a non-root user for security.
 
 **Build for your current architecture:**
 ```bash
-docker build -t product-matcher .
+docker build -t product-matcher:latest .
 ```
 
 **Run the container:**
 ```bash
-docker run -p 8000:8000 product-matcher
+docker run -p 8000:8000 product-matcher:latest
 ```
 
 ---
@@ -125,15 +143,30 @@ Returns the total number of products loaded in memory and system status.
 
 ---
 
+## 🔧 Configuration
+
+Edit `src/retrieval.py` to adjust:
+- `semantic_weight` (default: 0.7)
+- `lexical_weight` (default: 0.3)
+- `threshold_high` (default: 85)
+
+## 📈 Performance
+
+- **Recall@1**: 96.6%
+- **Recall@5**: 94.8%
+- **MMR**: 95.7%
+- **Dataset**: 5,270 products
+
 ## 🛠️ Tech Stack
 - **Backend:** Python 3.12, FastAPI, Uvicorn
 - **AI/Search:** Sentence-Transformers (All-MiniLM-L6-v2), FAISS, BM25
-- **Frontend:** HTML5/JavaScript (Tailwind/Fetch API)
+- **Frontend:** HTML5/JavaScript
 - **DevOps:** Docker, GitHub Actions, Pytest
 
 ## 📝 Authors
-**Oussama Mrabtini / Mouhamed Ghassan Ayyari / Ahmed Bouzid**  
-*FSB MLOPS-Project 2026*
+
+[Oussama Mrabtini / Mouhamed Ghassan Ayyari / Ahmed Bouzid]  
+FSB MLOPS-Project 2026
 
 ---
 
