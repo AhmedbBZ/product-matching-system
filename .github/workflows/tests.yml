@@ -34,6 +34,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Install test dependencies
+      run: |
+        pip install pytest pytest-asyncio httpx fastapi uvicorn
+
+    - name: Show installed packages
+      run: |
+        python -m pip show pip
+        pip --version
+        pip list
+
     - name: Run tests with pytest
       run: |
         pytest tests/ -v --tb=short --color=yes
