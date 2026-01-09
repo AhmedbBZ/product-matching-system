@@ -1,0 +1,7 @@
+# Minimal test dependencies (no heavy ML packages)
+fastapi
+uvicorn
+pytest>=7.0
+pytest-asyncio>=0.21.0
+httpx>=0.24.0
+pandas

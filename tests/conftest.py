@@ -2,18 +2,23 @@
 Pytest configuration and fixtures for the Product Matching System.
 """
 import pytest
-from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
 import sys
 import os
 
-# Add src directory to path so imports work
+# Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+# Mock heavy dependencies before importing app
+sys.modules['torch'] = MagicMock()
+sys.modules['sentence_transformers'] = MagicMock()
+sys.modules['faiss'] = MagicMock()
+sys.modules['rank_bm25'] = MagicMock()
 
 
 @pytest.fixture
 def mock_retriever():
-    """Mock retriever for testing without loading real models."""
+    """Mock retriever for testing."""
     retriever = Mock()
     retriever.search_hybrid = Mock(return_value=[
         {
@@ -45,43 +50,13 @@ def mock_df():
 
 @pytest.fixture
 def client(mock_retriever, mock_df):
-    """
-    Create a test client with mocked dependencies.
-    This avoids loading real models during testing.
-    """
-    # Import after path is set up
+    """Create a test client with mocked dependencies."""
+    from fastapi.testclient import TestClient
     from src.app import app
     
-    # Patch the global variables
+    # Patch the global variables and browser opening
     with patch('src.app.retriever', mock_retriever), \
          patch('src.app.df', mock_df), \
-         patch('src.app.webbrowser'):  # Prevent browser from opening
+         patch('src.app.webbrowser'):
         yield TestClient(app)
 
-
-@pytest.fixture
-def sample_search_results():
-    """Sample search results for testing."""
-    return {
-        "query": "dog food",
-        "results": [
-            {
-                "product_id": 123,
-                "title": "Rottweiler Puppy Dog Food",
-                "vendor": "Royal Canine",
-                "category": "Animals & Pet Supplies",
-                "semantic_score": 85.5,
-                "lexical_score": 80.0,
-                "final_score": 83.0,
-            },
-            {
-                "product_id": 456,
-                "title": "Vet Life Growth Canine Formula",
-                "vendor": "Farmina",
-                "category": "Animals & Pet Supplies",
-                "semantic_score": 75.0,
-                "lexical_score": 70.0,
-                "final_score": 73.0,
-            }
-        ]
-    }
