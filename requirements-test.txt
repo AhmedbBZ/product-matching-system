@@ -1,4 +1,3 @@
-# Minimal test dependencies (no heavy ML packages)
 fastapi
 uvicorn
 pytest>=7.0

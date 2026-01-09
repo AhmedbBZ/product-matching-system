@@ -1,1 +1,1 @@
-# This file makes the src directory a Python package
+# This file makes the src a python package so it don't conflict with Docker

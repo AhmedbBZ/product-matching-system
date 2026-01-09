@@ -1,27 +1,20 @@
-# Core dependencies
 pandas
 numpy
 
-# NLP and embeddings
 sentence-transformers
 torch
 
-# Vector search
 faiss-cpu
 
-# Lexical search
 rank-bm25
 
-# API
 fastapi
 uvicorn
 
-# Testing
 pytest>=7.0
 pytest-asyncio>=0.21.0
 httpx>=0.24.0
 
-# Evaluation
 scikit-learn
 jupyter
 matplotlib
