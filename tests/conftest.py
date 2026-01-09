@@ -11,12 +11,14 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # Provide lightweight stubs for heavy native modules that may not be
-# available in the CI/test environment (e.g. faiss). This lets the test
-# runner import application modules without installing large ML packages.
+# available in the CI/test environment. This lets the test runner import
+# application modules without installing large ML packages (torch, faiss, transformers, etc).
 try:
     import types
-    if 'faiss' not in sys.modules:
-        sys.modules['faiss'] = types.ModuleType('faiss')
+    heavy_modules = ['faiss', 'torch', 'sentence_transformers', 'sklearn', 'numpy']
+    for module_name in heavy_modules:
+        if module_name not in sys.modules:
+            sys.modules[module_name] = types.ModuleType(module_name)
 except Exception:
     pass
 
