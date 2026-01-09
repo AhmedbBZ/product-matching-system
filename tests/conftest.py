@@ -10,27 +10,6 @@ import os
 # Add src directory to path so imports work
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-# Provide lightweight stubs for heavy native modules that may not be
-# available in the CI/test environment. This lets the test runner import
-# application modules without installing large ML packages (torch, faiss, transformers, etc).
-try:
-    import types
-    heavy_modules = {
-        'faiss': {},
-        'torch': {'__version__': '0.0.0'},
-        'sentence_transformers': {'__version__': '0.0.0'},
-        'sklearn': {'__version__': '0.0.0'},
-        'numpy': {'__version__': '0.0.0'},
-    }
-    for module_name, attrs in heavy_modules.items():
-        if module_name not in sys.modules:
-            stub = types.ModuleType(module_name)
-            for attr_name, attr_value in attrs.items():
-                setattr(stub, attr_name, attr_value)
-            sys.modules[module_name] = stub
-except Exception:
-    pass
-
 
 @pytest.fixture
 def mock_retriever():
