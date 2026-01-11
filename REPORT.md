@@ -55,11 +55,26 @@ Build a system that takes a product query (example : "dog food") and matches it 
 
 **Code snippet**:
 ```python
-def create_searchable_text(self, row):
-    components = [row['title'], row['vendor'], row['category']]
-    tags = parse_tags(row['tags'])
-    filtered_tags = [t for t in tags if len(t) > 2]
-    return ' '.join(components + filtered_tags[:5])
+    def create_searchable_text(self, row: pd.Series) -> str:
+        components = []
+        
+        if pd.notna(row['title']):
+            components.append(str(row['title']))
+        
+        if pd.notna(row['vendor']):
+            components.append(str(row['vendor']))
+        
+        if pd.notna(row['category']):
+            components.append(str(row['category']))
+        
+        tags = self.parse_tags(row['tags'])
+        filtered_tags = [t for t in tags if len(t) > 2 and t not in ['brand', 'type', 'category']]
+        if filtered_tags:
+            components.append(' '.join(filtered_tags[:5]))
+        
+        full_text = ' '.join(components)
+        
+        return full_text
 ```
 
 ### 2.2 Embedding
