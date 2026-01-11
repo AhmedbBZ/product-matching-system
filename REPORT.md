@@ -3,33 +3,33 @@
 **Project**: NLP & Semantic Matching MVP  
 ---
 
-## Executive Summary
+## Introduction
 
-This report presents the design, implementation, and evaluation of a semantic product matching system that combines modern NLP techniques (sentence embeddings) with traditional information retrieval methods (BM25) to match product queries against a shop catalogue with high accuracy and low latency.
+This report presents the design, implementation, and evaluation of this product matching system that combines modern NLP techniques (sentence embeddings) with traditional information retrieval methods (BM25) to match product queries against a shop catalogue with high accuracy and low latency.
 
 **Key Results**:
-- Achieved 85-95% Recall@5 across diverse query types
+- 85-95% Recall@5 across different testings
 - Average response time < 100ms
 - Well-calibrated confidence scores
-- Successfully handles typos, variations, and partial queries
+- Handles typos, variations, and partial queries
 
 ---
 
 ## 1. Problem Statement
 
 ### 1.1 Objective
-Build a system that takes a product query (e.g., "dog food for large breeds") and matches it against a shop product catalogue, returning:
+Build a system that takes a product query (example : "dog food") and matches it against a shop product catalogue, wich returns:
 - Top-k most similar items
 - Confidence scores (0-100%)
 - Quality indicators (HIGH/MEDIUM/LOW)
 - Explanation of match reasoning
 
 ### 1.2 Challenges
-1. **Semantic Understanding**: "dog food" should match "canine nutrition", "pet food", etc.
+1. **Semantic Understanding**: "dog food" should be semantically consistent with other sentences like "canine nutrition", "pet food", etc.
 2. **Lexical Precision**: Technical terms like model numbers need exact matches
 3. **Robustness**: Handle typos, abbreviations, and incomplete queries
 4. **Speed**: Real-time response (<500ms)
-5. **Calibration**: Confidence scores must reflect actual accuracy
+5. **Calibration**: Confidence scores that is consistent with the actual accuracy
 
 ---
 
@@ -62,20 +62,15 @@ def create_searchable_text(self, row):
     return ' '.join(components + filtered_tags[:5])
 ```
 
-### 2.2 Embedding Architecture
+### 2.2 Embedding
 
 #### Model Selection
 **Chosen Model**: `all-MiniLM-L6-v2`
 
-**Rationale**:
+**Reasons**:
 - Efficient: 384 dimensions (vs 768 for larger models)
-- Fast inference: ~5ms per query
-- Good balance of speed and quality
+- Fast: ~5ms per query
 - Pre-trained on diverse datasets
-
-**Alternatives Considered**:
-- `all-mpnet-base-v2`: Higher quality but slower
-- `multi-qa-MiniLM-L6-cos-v1`: Optimized for Q&A but less general
 
 #### Embedding Process
 1. Text → SentenceTransformer → 384-dim vector
@@ -135,7 +130,7 @@ final_score = (0.7 × semantic_score) + (0.3 × lexical_score)
 1. Started with 50/50 split
 2. Evaluated on validation set
 3. Semantic search performed better overall
-4. Settled on 70/30 based on Recall@5 optimization
+4. Based on Recall@5 optimization, we settled on 70/30 split
 
 **Sensitivity Analysis**:
 | Semantic Weight | Lexical Weight | Recall@5 |
@@ -169,7 +164,7 @@ confidence < 40   → VERY_LOW  # Reject
 | 40-60%          | 50%       | 48%             | +2%               |
 | 0-40%           | 20%       | 18%             | +2%               |
 
-**Conclusion**: Well-calibrated (< 5% error)
+**Conclusion**: Calibration results are satisfying (< 5% error)
 
 ---
 
@@ -216,11 +211,11 @@ Type: Variation
 | Category | 13 | 69.2% | 92.3% | 0.77 |
 | Variation | 12 | 58.3% | 91.7% | 0.68 |
 
-**Insights**:
-- Exact matches always succeed (expected)
-- Partial queries perform well (vendor+keywords effective)
+**Observations**:
+- Exact matches always succeed
+- Partial queries perform well (vendor+keywords)
 - Category queries show good recall but lower ranking
-- Variations are most challenging (semantic understanding needed)
+- Variations are most challenging, wich needs more semantic understanding
 
 ### 3.4 Response Time Analysis
 
@@ -239,9 +234,9 @@ Type: Variation
 4. Score fusion: ~7ms (8%)
 
 **Optimization Opportunities**:
-- Cache frequent queries (could reduce 50% of queries)
+- Cache frequent queries, which may reduce a significant amount of queries
 - Batch processing for multiple queries
-- GPU acceleration for embeddings
+- GPU acceleration for embeddings (If hardware allows)
 
 ### 3.5 Confidence Distribution
 
@@ -253,9 +248,9 @@ Type: Variation
 ```
 
 **Interpretation**:
-- 70% of results have >60% confidence (actionable)
-- 35% HIGH confidence (auto-approve candidates)
-- Distribution is reasonable, not over/under-confident
+- 70% of results have >=60% confidence
+- 35% HIGH confidence. Theses are the auto-approved
+- Distribution is reasonable, not over-confident nor under
 
 ### 3.6 Error Analysis
 
@@ -264,25 +259,25 @@ Type: Variation
 1. **Multi-word Brand Names** (15% of errors)
    - Query: "bully sticks"
    - Missed: "Bully Sticks & Dog Toy" (ranked #7)
-   - Reason: Other products with "bully" in tags ranked higher
+   - Reason: Other products with "bully" in tags are ranked higher
 
 2. **Generic Terms** (25% of errors)
    - Query: "dog toy"
-   - Challenge: 200+ products match, ranking is difficult
+   - Challenge: 200+ products match, wich makes ranking difficult
 
 3. **Abbreviations** (10% of errors)
    - Query: "pup food"
    - Missed: Products with "puppy" or "dog"
-   - Solution: Query expansion needed
+   - Solution: Expanding the query may improve it
 
 4. **Tag Noise** (20% of errors)
    - Products with many irrelevant tags confuse semantic matching
    - Example: Tags like "JANSALE18", "nonsale19" add noise
 
 **Solutions Implemented**:
-- Filter out short tags (< 3 chars)
+- Filter out short tags, we chose less than 3 chars
 - Limit to 5 most relevant tags
-- Hybrid approach helps lexical catch what semantic misses
+- Use hybrid approach that combines lexical and semantic because they compliment each other
 
 ---
 
@@ -292,17 +287,17 @@ Type: Variation
 
 1. **Robust Performance**: 93% Recall@5 across diverse queries
 2. **Fast Response**: <100ms average, suitable for real-time
-3. **Well-Calibrated**: Confidence scores match actual accuracy
+3. **Well-Calibrated**: Confidence scores are consistent with actual accuracy
 4. **Hybrid Approach**: Combines best of semantic and lexical
 5. **Scalable**: Can handle 100k+ products with minor changes
 
 ### 4.2 Limitations
 
-1. **Cold Start**: New products need reindexing (batch process)
+1. **Cold Start**: New products need reindexing
 2. **Domain-Specific**: Trained on general text, not pet supplies
-3. **Query Complexity**: Struggles with very long queries (>50 words)
+3. **Query Complexity**: Struggles with very long queries like those with 50+ words
 4. **Multilingual**: Currently English-only
-5. **Spelling**: No explicit spell-correction
+5. **Spelling**: No explicit spelling correction
 
 ### 4.3 Comparison with Baselines
 
@@ -335,53 +330,12 @@ Type: Variation
 
 ---
 
-## 5. Future Work
+## 5. Improvement points for the future 
 
-### 5.1 Short-term (1-2 weeks)
-
-1. **Cross-Encoder Reranking**
-   - Take top-20 from hybrid
-   - Rerank with cross-encoder for accuracy boost
-   - Expected: +5% Recall@1
-
-2. **Query Expansion**
-   - Add synonyms: "dog" → ["canine", "puppy", "pup"]
-   - Use WordNet or custom dictionary
-
-3. **Spell Correction**
-   - Add fuzzy matching for typos
-   - Use SymSpell or similar
-
-### 5.2 Medium-term (1 month)
-
-1. **Multimodal Matching**
-   - Add product images
-   - Use CLIP for image-text matching
-   - Handle "show me a picture" queries
-
-2. **Fine-tuning**
-   - Fine-tune sentence-transformer on domain data
-   - Create synthetic query-product pairs
-   - Expected: +10% performance
-
-3. **User Feedback Loop**
-   - Collect clicks and approvals
-   - Retrain with user preferences
-   - Personalization
-
-### 5.3 Long-term (3+ months)
-
-1. **Neural Reranking End-to-End**
-   - Replace fusion with learned ranker
-   - Use LambdaRank or similar
-
-2. **Query Understanding**
-   - Parse intent: search vs comparison vs recommendation
-   - Multi-intent handling
-
-3. **Explainability**
-   - Highlight matching terms
-   - Show why items ranked as they did
+- Fine tuning to a specific domain
+- Add synonyms to words : "dogs" = "puppy", "canine", etc
+- Add spell correction
+- Migrate to a more complex system (like neural networks)
 
 ---
 
@@ -393,8 +347,6 @@ This project successfully demonstrates a production-ready semantic matching syst
 - Low latency (<100ms)
 - Well-calibrated confidence
 - Robust to query variations
-
-The system is deployable, scalable, and has clear paths for improvement through reranking, fine-tuning, and multimodal extensions.
 
 ---
 
